@@ -1,0 +1,458 @@
+---
+title: "Untitled"
+author: "luohh"
+date: "2022/7/1"
+output: html_document
+---
+
+```{r}
+install.packages("ISLR")
+install.packages("glmnet")
+install.packages("randomForest")
+install.packages("pROC")
+library(pROC)
+library(data.table)
+library(ISLR)
+library(glmnet)
+library(randomForest)
+```
+
+```{r}
+############################################################################### 回归 ######################################################################
+###################### 多元线性回归 ##################
+### k = 1
+kmer1_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/1-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer1_data) <- kmer1_data[,1]
+kmer1_data <- kmer1_data[,-1]
+kmer1_data[,2:ncol(kmer1_data)] <- (kmer1_data[,2:ncol(kmer1_data)]-min(kmer1_data[,2:ncol(kmer1_data)]))/(max(kmer1_data[,2:ncol(kmer1_data)]) - min(kmer1_data[,2:ncol(kmer1_data)]))
+kmer1_data[,1] <- log10(kmer1_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer1_data),nrow(kmer1_data)/2)
+train_data <- kmer1_data[train,]
+test_data <- kmer1_data[-train,]
+
+y.test = kmer1_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer1.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer1.lm.fit)
+
+kmer1.y.test.predict <- predict(kmer1.lm.fit,test_data)
+kmer1.pcc <- cor(y.test,kmer1.y.test.predict)
+kmer1.mse <- mean((kmer1.y.test.predict-y.test)^2)
+
+### k = 2
+kmer2_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/2-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer2_data) <- kmer2_data[,1]
+kmer2_data <- kmer2_data[,-1]
+kmer2_data[,2:ncol(kmer2_data)] <- (kmer2_data[,2:ncol(kmer2_data)]-min(kmer2_data[,2:ncol(kmer2_data)]))/(max(kmer2_data[,2:ncol(kmer2_data)]) - min(kmer2_data[,2:ncol(kmer2_data)]))
+kmer2_data[,1] <- log10(kmer2_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer2_data),nrow(kmer2_data)/2)
+train_data <- kmer2_data[train,]
+test_data <- kmer2_data[-train,]
+
+y.test = kmer2_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer2.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer2.lm.fit)
+
+kmer2.y.test.predict <- predict(kmer2.lm.fit,test_data)
+kmer2.pcc <- cor(y.test,kmer2.y.test.predict)
+kmer2.mse <- mean((kmer2.y.test.predict-y.test)^2)
+
+### k = 3
+kmer3_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/3-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer3_data) <- kmer3_data[,1]
+kmer3_data <- kmer3_data[,-1]
+kmer3_data[,2:ncol(kmer3_data)] <- (kmer3_data[,2:ncol(kmer3_data)]-min(kmer3_data[,2:ncol(kmer3_data)]))/(max(kmer3_data[,2:ncol(kmer3_data)]) - min(kmer3_data[,2:ncol(kmer3_data)]))
+kmer3_data[,1] <- log10(kmer3_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer3_data),nrow(kmer3_data)/2)
+train_data <- kmer3_data[train,]
+test_data <- kmer3_data[-train,]
+
+y.test = kmer3_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer3.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer3.lm.fit)
+
+kmer3.y.test.predict <- predict(kmer3.lm.fit,test_data)
+kmer3.pcc <- cor(y.test,kmer3.y.test.predict)
+kmer3.mse <- mean((kmer3.y.test.predict-y.test)^2)
+
+### k = 4
+kmer4_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/4-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer4_data) <- kmer4_data[,1]
+kmer4_data <- kmer4_data[,-1]
+kmer4_data[,2:ncol(kmer4_data)] <- (kmer4_data[,2:ncol(kmer4_data)]-min(kmer4_data[,2:ncol(kmer4_data)]))/(max(kmer4_data[,2:ncol(kmer4_data)]) - min(kmer4_data[,2:ncol(kmer4_data)]))
+kmer4_data[,1] <- log10(kmer4_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer4_data),nrow(kmer4_data)/2)
+train_data <- kmer4_data[train,]
+test_data <- kmer4_data[-train,]
+
+y.test = kmer4_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer4.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer4.lm.fit)
+
+kmer4.y.test.predict <- predict(kmer4.lm.fit,test_data)
+kmer4.pcc <- cor(y.test,kmer4.y.test.predict)
+kmer4.mse <- mean((kmer4.y.test.predict-y.test)^2)
+
+### k = 5
+kmer5_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/5-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer5_data) <- kmer5_data[,1]
+kmer5_data <- kmer5_data[,-1]
+kmer5_data[,2:ncol(kmer5_data)] <- (kmer5_data[,2:ncol(kmer5_data)]-min(kmer5_data[,2:ncol(kmer5_data)]))/(max(kmer5_data[,2:ncol(kmer5_data)]) - min(kmer5_data[,2:ncol(kmer5_data)]))
+kmer5_data[,1] <- log10(kmer5_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer5_data),nrow(kmer5_data)/2)
+train_data <- kmer5_data[train,]
+test_data <- kmer5_data[-train,]
+
+y.test = kmer5_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer5.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer5.lm.fit)
+
+kmer5.y.test.predict <- predict(kmer5.lm.fit,test_data)
+kmer5.pcc <- cor(y.test,kmer5.y.test.predict)
+kmer5.mse <- mean((kmer5.y.test.predict-y.test)^2)
+
+### k = 6
+kmer6_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/6-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer6_data) <- kmer6_data[,1]
+kmer6_data <- kmer6_data[,-1]
+kmer6_data[,2:ncol(kmer6_data)] <- (kmer6_data[,2:ncol(kmer6_data)]-min(kmer6_data[,2:ncol(kmer6_data)]))/(max(kmer6_data[,2:ncol(kmer6_data)]) - min(kmer6_data[,2:ncol(kmer6_data)]))
+kmer6_data[,1] <- log10(kmer6_data[,1] + 1)
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer6_data),nrow(kmer6_data)/2)
+train_data <- kmer6_data[train,]
+test_data <- kmer6_data[-train,]
+
+y.test = kmer6_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer6.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer6.lm.fit)
+
+kmer6.y.test.predict <- predict(kmer6.lm.fit,test_data)
+kmer6.pcc <- cor(y.test,kmer6.y.test.predict)
+kmer6.mse <- mean((kmer6.y.test.predict-y.test)^2)
+
+#####################################################################################################################
+### k = 7
+kmer7_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/7-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer7_data) <- kmer7_data[,1]
+kmer7_data <- kmer7_data[,-1]
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer7_data),nrow(kmer7_data)/2)
+train_data <- kmer7_data[train,]
+test_data <- kmer7_data[-train,]
+
+y.test = kmer7_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer7.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer7.lm.fit)
+
+kmer7.y.test.predict <- predict(kmer7.lm.fit,test_data)
+kmer7.pcc <- cor(y.test,kmer7.y.test.predict)
+kmer7.mse <- mean((kmer7.y.test.predict-y.test)^2)
+
+### k = 8
+kmer8_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/8-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer8_data) <- kmer8_data[,1]
+kmer8_data <- kmer8_data[,-1]
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer8_data),nrow(kmer8_data)/2)
+train_data <- kmer8_data[train,]
+test_data <- kmer8_data[-train,]
+
+y.test = kmer8_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer8.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer8.lm.fit)
+
+kmer8.y.test.predict <- predict(kmer8.lm.fit,test_data)
+kmer8.pcc <- cor(y.test,kmer8.y.test.predict)
+kmer8.mse <- mean((kmer8.y.test.predict-y.test)^2)
+
+### k = 9
+kmer9_data <- read.table("/home/luohh/Course/SWTJX/Regression/Result/9-mer_freq.res",header = T,stringsAsFactors = F)
+rownames(kmer9_data) <- kmer9_data[,1]
+kmer9_data <- kmer9_data[,-1]
+
+# 随机生成训练集和测试集
+set.seed(111111)
+train <- sample(nrow(kmer9_data),nrow(kmer9_data)/2)
+train_data <- kmer9_data[train,]
+test_data <- kmer9_data[-train,]
+
+y.test = kmer9_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer9.lm.fit <- lm(TPM~.,data = train_data)
+summary(kmer9.lm.fit)
+
+kmer9.y.test.predict <- predict(kmer9.lm.fit,test_data)
+kmer9.pcc <- cor(y.test,kmer9.y.test.predict)
+kmer9.mse <- mean((kmer9.y.test.predict-y.test)^2)
+```
+
+```{r}
+### 岭回归
+# k = 1
+set.seed(111111)
+train <- sample(nrow(kmer1_data),nrow(kmer1_data)/2)
+x.train <- as.matrix(kmer1_data[train,-1])
+y.train <- kmer1_data[train,1]
+
+x.test <- as.matrix(kmer1_data[-train,-1])
+y.test = kmer1_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer1.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer1.ridge.cv.fit$lambda.min
+kmer1.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer1.y.test.predict <- predict(kmer1.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer1.ridge.pcc <- cor(y.test,kmer1.y.test.predict)
+kmer1.ridge.mse <- mean((kmer1.y.test.predict-y.test)^2)
+
+# k = 2
+set.seed(111111)
+train <- sample(nrow(kmer2_data),nrow(kmer2_data)/2)
+x.train <- kmer2_data[train,-1]
+y.train <- kmer2_data[train,]$TPM
+
+x.test <- kmer2_data[-train,-1]
+y.test = kmer2_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer2.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer2.ridge.cv.fit$lambda.min
+kmer2.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer2.y.test.predict <- predict(kmer2.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer2.ridge.pcc <- cor(y.test,kmer2.y.test.predict)
+kmer2.ridge.mse <- mean((kmer2.y.test.predict-y.test)^2)
+
+# k = 3
+set.seed(111111)
+train <- sample(nrow(kmer3_data),nrow(kmer3_data)/2)
+x.train <- kmer3_data[train,-1]
+y.train <- kmer3_data[train,]$TPM
+
+x.test <- kmer3_data[-train,-1]
+y.test = kmer3_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer3.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer3.ridge.cv.fit$lambda.min
+kmer3.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer3.y.test.predict <- predict(kmer3.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer3.ridge.pcc <- cor(y.test,kmer3.y.test.predict)
+kmer3.ridge.mse <- mean((kmer3.y.test.predict-y.test)^2)
+
+# k = 4
+set.seed(111111)
+train <- sample(nrow(kmer4_data),nrow(kmer3_data)/2)
+x.train <- kmer4_data[train,-1]
+y.train <- kmer4_data[train,]$TPM
+
+x.test <- kmer4_data[-train,-1]
+y.test = kmer4_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer4.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer4.ridge.cv.fit$lambda.min
+kmer4.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer4.y.test.predict <- predict(kmer4.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer4.ridge.pcc <- cor(y.test,kmer4.y.test.predict)
+kmer4.ridge.mse <- mean((kmer4.y.test.predict-y.test)^2)
+
+# k = 5
+set.seed(111111)
+train <- sample(nrow(kmer5_data),nrow(kmer5_data)/2)
+x.train <- kmer5_data[train,-1]
+y.train <- kmer5_data[train,]$TPM
+
+x.test <- kmer5_data[-train,-1]
+y.test = kmer5_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer5.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer5.ridge.cv.fit$lambda.min
+kmer5.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer5.y.test.predict <- predict(kmer5.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer5.ridge.pcc <- cor(y.test,kmer5.y.test.predict)
+kmer5.ridge.mse <- mean((kmer5.y.test.predict-y.test)^2)
+
+### k = 6
+set.seed(111111)
+train <- sample(nrow(kmer6_data),nrow(kmer6_data)/2)
+x.train <- kmer6_data[train,-1]
+y.train <- kmer6_data[train,]$TPM
+
+x.test <- kmer6_data[-train,-1]
+y.test = kmer6_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer6.ridge.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=0)
+best_lambda <- kmer6.ridge.cv.fit$lambda.min
+kmer6.ridge.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=0,lambda = best_lambda)
+kmer6.y.test.predict <- predict(kmer6.ridge.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer6.ridge.pcc <- cor(y.test,kmer6.y.test.predict)
+kmer6.ridge.mse <- mean((kmer6.y.test.predict-y.test)^2)
+```
+
+```{r}
+### lasso
+# k = 1
+set.seed(111111)
+train <- sample(nrow(kmer1_data),nrow(kmer1_data)/2)
+x.train <- as.matrix(kmer1_data[train,-1])
+y.train <- kmer1_data[train,1]
+
+x.test <- as.matrix(kmer1_data[-train,-1])
+y.test = kmer1_data[-train,1]
+names(y.test) <- rownames(test_data)
+
+kmer1.lasso.cv.fit <- cv.glmnet(x.train,y.train,alpha=1)
+best_lambda <- kmer1.lasso.cv.fit$lambda.min
+kmer1.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer1.y.test.predict <- predict(kmer1.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer1.lasso.pcc <- cor(y.test,kmer1.y.test.predict)
+kmer1.lasso.mse <- mean((kmer1.y.test.predict-y.test)^2)
+
+# k = 2
+set.seed(111111)
+train <- sample(nrow(kmer2_data),nrow(kmer2_data)/2)
+x.train <- kmer2_data[train,-1]
+y.train <- kmer2_data[train,]$TPM
+
+x.test <- kmer2_data[-train,-1]
+y.test = kmer2_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer2.lasso.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=1)
+best_lambda <- kmer2.lasso.cv.fit$lambda.min
+kmer2.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer2.y.test.predict <- predict(kmer2.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer2.lasso.pcc <- cor(y.test,kmer2.y.test.predict)
+kmer2.lasso.mse <- mean((kmer2.y.test.predict-y.test)^2)
+
+# k = 3
+set.seed(111111)
+train <- sample(nrow(kmer3_data),nrow(kmer3_data)/2)
+x.train <- kmer3_data[train,-1]
+y.train <- kmer3_data[train,]$TPM
+
+x.test <- kmer3_data[-train,-1]
+y.test = kmer3_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer3.lasso.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=1)
+best_lambda <- kmer3.lasso.cv.fit$lambda.min
+kmer3.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer3.y.test.predict <- predict(kmer3.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer3.lasso.pcc <- cor(y.test,kmer3.y.test.predict)
+kmer3.lasso.mse <- mean((kmer3.y.test.predict-y.test)^2)
+
+# k = 4
+set.seed(111111)
+train <- sample(nrow(kmer4_data),nrow(kmer3_data)/2)
+x.train <- kmer4_data[train,-1]
+y.train <- kmer4_data[train,]$TPM
+
+x.test <- kmer4_data[-train,-1]
+y.test = kmer4_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer4.lasso.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=1)
+best_lambda <- kmer4.lasso.cv.fit$lambda.min
+kmer4.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer4.y.test.predict <- predict(kmer4.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer4.lasso.pcc <- cor(y.test,kmer4.y.test.predict)
+kmer4.lasso.mse <- mean((kmer4.y.test.predict-y.test)^2)
+
+# k = 5
+set.seed(111111)
+train <- sample(nrow(kmer5_data),nrow(kmer5_data)/2)
+x.train <- kmer5_data[train,-1]
+y.train <- kmer5_data[train,]$TPM
+
+x.test <- kmer5_data[-train,-1]
+y.test = kmer5_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer5.lasso.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=1)
+best_lambda <- kmer5.lasso.cv.fit$lambda.min
+kmer5.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer5.y.test.predict <- predict(kmer5.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer5.lasso.pcc <- cor(y.test,kmer5.y.test.predict)
+kmer5.lasso.mse <- mean((kmer5.y.test.predict-y.test)^2)
+
+### k = 6
+set.seed(111111)
+train <- sample(nrow(kmer6_data),nrow(kmer6_data)/2)
+x.train <- kmer6_data[train,-1]
+y.train <- kmer6_data[train,]$TPM
+
+x.test <- kmer6_data[-train,-1]
+y.test = kmer6_data[-train,]$TPM
+names(y.test) <- rownames(test_data)
+
+kmer6.lasso.cv.fit <- cv.glmnet(data.matrix(x.train),y.train,alpha=1)
+best_lambda <- kmer6.lasso.cv.fit$lambda.min
+kmer6.lasso.best.fit <- glmnet(data.matrix(x.train),y.train,alpha=1,lambda = best_lambda)
+kmer6.y.test.predict <- predict(kmer6.lasso.best.fit,data.matrix(x.test),s=best_lambda)
+
+kmer6.lasso.pcc <- cor(y.test,kmer6.y.test.predict)
+kmer6.lasso.mse <- mean((kmer6.y.test.predict-y.test)^2)
+```
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,764 @@
+---
+title: "Untitled"
+author: "luohh"
+date: "2022/7/1"
+output: html_document
+---
+
+```{r}
+install.packages("ISLR")
+install.packages("glmnet")
+install.packages("randomForest")
+install.packages("e1071")
+install.packages("pROC")
+library(pROC)
+library(data.table)
+library(ISLR)
+library(glmnet)
+library(randomForest)
+library(e1071)
+```
+
+```{r}
+############################################################################# 分类 #########################################################################
+### Logistic 回归
+# K = 1
+kmer1_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/1-mer_freq.res",header = T)
+#rownames(kmer1_data) <- kmer1_data[,1]
+kmer1_data <- kmer1_data[,-1]
+kmer1_data[,2:ncol(kmer1_data)] <- (kmer1_data[,2:ncol(kmer1_data)]-min(kmer1_data[,2:ncol(kmer1_data)]))/(max(kmer1_data[,2:ncol(kmer1_data)]) - min(kmer1_data[,2:ncol(kmer1_data)]))
+kmer1_data$Label <- as.factor(kmer1_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer1_data[kmer1_data$Label==1,]
+neg_data <- kmer1_data[kmer1_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer1.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+kmer1.y.logistic.pro <- predict(kmer1.logistic.fit,x.test,type = "response")
+kmer1.y.logistic.predict <- ifelse(kmer1.y.logistic.pro>=0.5,"1","0")
+
+kmer1.y.logistic.res <- table(y.test,kmer1.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer1.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 2
+kmer2_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/2-mer_freq.res",header = T)
+kmer2_data <- kmer2_data[,-1]
+kmer2_data[,2:ncol(kmer2_data)] <- (kmer2_data[,2:ncol(kmer2_data)]-min(kmer2_data[,2:ncol(kmer2_data)]))/(max(kmer2_data[,2:ncol(kmer2_data)]) - min(kmer2_data[,2:ncol(kmer2_data)]))
+kmer2_data$Label <- as.factor(kmer2_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer2_data[kmer2_data$Label==1,]
+neg_data <- kmer2_data[kmer2_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer2.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+kmer2.y.logistic.pro <- predict(kmer2.logistic.fit,x.test,type = "response")
+kmer2.y.logistic.predict <- ifelse(kmer2.y.logistic.pro>=0.5,"1","0")
+
+kmer2.y.logistic.res <- table(y.test,kmer2.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer2.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 3
+kmer3_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/3-mer_freq.res",header = T)
+kmer3_data <- kmer3_data[,-1]
+kmer3_data[,2:ncol(kmer3_data)] <- (kmer3_data[,2:ncol(kmer3_data)]-min(kmer3_data[,2:ncol(kmer3_data)]))/(max(kmer3_data[,2:ncol(kmer3_data)]) - min(kmer3_data[,2:ncol(kmer3_data)]))
+kmer3_data$Label <- as.factor(kmer3_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer3_data[kmer3_data$Label==1,]
+neg_data <- kmer3_data[kmer3_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer3.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+kmer3.y.logistic.pro <- predict(kmer3.logistic.fit,x.test,type = "response")
+kmer3.y.logistic.predict <- ifelse(kmer3.y.logistic.pro>=0.5,"1","0")
+
+kmer3.y.logistic.res <- table(y.test,kmer3.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer3.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 4
+kmer4_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/4-mer_freq.res",header = T)
+kmer4_data <- kmer4_data[,-1]
+kmer4_data[,2:ncol(kmer4_data)] <- (kmer4_data[,2:ncol(kmer4_data)]-min(kmer4_data[,2:ncol(kmer4_data)]))/(max(kmer4_data[,2:ncol(kmer4_data)]) - min(kmer4_data[,2:ncol(kmer4_data)]))
+kmer4_data$Label <- as.factor(kmer4_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer4_data[kmer4_data$Label==1,]
+neg_data <- kmer4_data[kmer4_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer4.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+kmer4.y.logistic.pro <- predict(kmer4.logistic.fit,x.test,type = "response")
+kmer4.y.logistic.predict <- ifelse(kmer4.y.logistic.pro>=0.5,"1","0")
+
+kmer4.y.logistic.res <- table(y.test,kmer4.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer4.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 5
+kmer5_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/5-mer_freq.res",header = T)
+kmer5_data <- kmer5_data[,-1]
+kmer5_data[,2:ncol(kmer5_data)] <- (kmer5_data[,2:ncol(kmer5_data)]-min(kmer5_data[,2:ncol(kmer5_data)]))/(max(kmer5_data[,2:ncol(kmer5_data)]) - min(kmer5_data[,2:ncol(kmer5_data)]))
+kmer5_data$Label <- as.factor(kmer5_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer5_data[kmer5_data$Label==1,]
+neg_data <- kmer5_data[kmer5_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer5.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+kmer5.y.logistic.pro <- predict(kmer5.logistic.fit,x.test,type = "response")
+kmer5.y.logistic.predict <- ifelse(kmer5.y.logistic.pro>=0.5,"1","0")
+
+kmer5.y.logistic.res <- table(y.test,kmer5.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer5.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 6
+kmer6_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/6-mer_freq.res",header = T)
+kmer6_data <- kmer6_data[,-1]
+kmer6_data[,2:ncol(kmer6_data)] <- (kmer6_data[,2:ncol(kmer6_data)]-min(kmer6_data[,2:ncol(kmer6_data)]))/(max(kmer6_data[,2:ncol(kmer6_data)]) - min(kmer6_data[,2:ncol(kmer6_data)]))
+kmer6_data$Label <- as.factor(kmer6_data$Label)
+
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer6_data[kmer6_data$Label==1,]
+neg_data <- kmer6_data[kmer6_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer6.logistic.fit <- glm(Label~.,data = train_data,family = binomial(link='logit'))
+
+kmer6.y.logistic.pro <- predict(kmer6.logistic.fit,newdata = x.test,type = "response")
+kmer6.y.logistic.predict <- ifelse(kmer6.y.logistic.pro>=0.5,"1","0")
+kmer6.y.logistic.res <- table(y.test,kmer6.y.logistic.predict)
+plot.roc(y.test, as.numeric(kmer6.y.logistic.pro), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+```
+
+```{r}
+### random forest
+# K = 1 
+kmer1_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/1-mer_freq.res",header = T)
+kmer1_data <- kmer1_data[,-1]
+kmer1_data[,2:ncol(kmer1_data)] <- (kmer1_data[,2:ncol(kmer1_data)]-min(kmer1_data[,2:ncol(kmer1_data)]))/(max(kmer1_data[,2:ncol(kmer1_data)]) - min(kmer1_data[,2:ncol(kmer1_data)]))
+kmer1_data$Label <- as.factor(kmer1_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer1_data[kmer1_data$Label==1,]
+neg_data <- kmer1_data[kmer1_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer1.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer1.y.rf.predict <- predict(kmer1.rf.fit,x.test)
+
+kmer1.rm.acc.res <- table(y.test,kmer1.y.rf.predict)
+kmer1.rm.acc <- (kmer1.rm.acc.res[1,1]+kmer1.rm.acc.res[2,2])/sum(kmer1.rm.acc.res)
+plot.roc(y.test, as.numeric(kmer1.y.rf.predict), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 2
+kmer2_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/2-mer_freq.res",header = T)
+kmer2_data <- kmer2_data[,-1]
+kmer2_data[,2:ncol(kmer2_data)] <- (kmer2_data[,2:ncol(kmer2_data)]-min(kmer2_data[,2:ncol(kmer2_data)]))/(max(kmer2_data[,2:ncol(kmer2_data)]) - min(kmer2_data[,2:ncol(kmer2_data)]))
+kmer2_data$Label <- as.factor(kmer2_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer2_data[kmer2_data$Label==1,]
+neg_data <- kmer2_data[kmer2_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer2.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer2.y.rf.predict <- predict(kmer2.rf.fit,x.test)
+
+kmer2.rm.acc.res <- table(y.test,kmer2.y.rf.predict)
+kmer2.rm.acc <- (kmer2.rm.acc.res[1,1]+kmer2.rm.acc.res[2,2])/sum(kmer2.rm.acc.res)
+plot.roc(y.test, as.numeric(kmer2.y.rf.predict), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 3
+kmer3_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/3-mer_freq.res",header = T)
+kmer3_data <- kmer3_data[,-1]
+kmer3_data[,2:ncol(kmer3_data)] <- (kmer3_data[,2:ncol(kmer3_data)]-min(kmer3_data[,2:ncol(kmer3_data)]))/(max(kmer3_data[,2:ncol(kmer3_data)]) - min(kmer3_data[,2:ncol(kmer3_data)]))
+kmer3_data$Label <- as.factor(kmer3_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer3_data[kmer3_data$Label==1,]
+neg_data <- kmer3_data[kmer3_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer3.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer3.y.rf.predict <- predict(kmer3.rf.fit,x.test)
+
+kmer3.rm.acc.res <- table(y.test,kmer3.y.rf.predict)
+kmer3.rm.acc <- (kmer3.rm.acc.res[1,1]+kmer3.rm.acc.res[2,2])/sum(kmer3.rm.acc.res)
+plot.roc(y.test, as.numeric(kmer3.y.rf.predict), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 4
+kmer4_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/4-mer_freq.res",header = T)
+kmer4_data <- kmer4_data[,-1]
+kmer4_data[,2:ncol(kmer4_data)] <- (kmer4_data[,2:ncol(kmer4_data)]-min(kmer4_data[,2:ncol(kmer4_data)]))/(max(kmer4_data[,2:ncol(kmer4_data)]) - min(kmer4_data[,2:ncol(kmer4_data)]))
+kmer4_data$Label <- as.factor(kmer4_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer4_data[kmer4_data$Label==1,]
+neg_data <- kmer4_data[kmer4_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer4.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer4.y.rf.predict <- predict(kmer4.rf.fit,x.test)
+
+kmer4.rm.acc.res <- table(y.test,kmer4.y.rf.predict)
+kmer4.rm.acc <- (kmer4.rm.acc.res[1,1]+kmer4.rm.acc.res[2,2])/sum(kmer4.rm.acc.res)
+plot.roc(y.test, as.numeric(kmer4.y.rf.predict), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# K = 5
+kmer5_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/5-mer_freq.res",header = T)
+kmer5_data <- kmer5_data[,-1]
+kmer5_data[,2:ncol(kmer5_data)] <- (kmer5_data[,2:ncol(kmer5_data)]-min(kmer5_data[,2:ncol(kmer5_data)]))/(max(kmer5_data[,2:ncol(kmer5_data)]) - min(kmer5_data[,2:ncol(kmer5_data)]))
+kmer5_data$Label <- as.factor(kmer5_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer5_data[kmer5_data$Label==1,]
+neg_data <- kmer5_data[kmer5_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer5.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer5.y.rf.predict <- predict(kmer5.rf.fit,x.test)
+
+kmer5.rm.acc.res <- table(y.test,kmer5.y.rf.predict)
+kmer5.rm.acc <- (kmer5.rm.acc.res[1,1]+kmer5.rm.acc.res[2,2])/sum(kmer5.rm.acc.res)
+
+# K = 6 
+kmer6_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/6-mer_freq.res",header = T)
+kmer6_data <- kmer6_data[,-1]
+kmer6_data[,2:ncol(kmer6_data)] <- (kmer6_data[,2:ncol(kmer6_data)]-min(kmer6_data[,2:ncol(kmer6_data)]))/(max(kmer6_data[,2:ncol(kmer6_data)]) - min(kmer6_data[,2:ncol(kmer6_data)]))
+kmer6_data$Label <- as.factor(kmer6_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer6_data[kmer6_data$Label==1,]
+neg_data <- kmer6_data[kmer6_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+ntree = 50
+mtry <- round(ncol(x.train)^(1/2))
+kmer6.rf.fit <- randomForest(x.train,y.train,ntree = ntree,mtry = mtry)
+kmer6.y.rf.predict <- predict(kmer6.rf.fit,x.test)
+
+kmer6.rm.acc.res <- table(y.test,kmer6.y.rf.predict)
+kmer6.rm.acc <- (kmer6.rm.acc.res[1,1]+kmer6.rm.acc.res[2,2])/sum(kmer6.rm.acc.res)
+
+```
+
+```{r}
+### 支持向量机 radial
+# k = 1
+kmer1_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/1-mer_freq.res",header = T)
+kmer1_data <- kmer1_data[,-1]
+kmer1_data[,2:ncol(kmer1_data)] <- (kmer1_data[,2:ncol(kmer1_data)]-min(kmer1_data[,2:ncol(kmer1_data)]))/(max(kmer1_data[,2:ncol(kmer1_data)]) - min(kmer1_data[,2:ncol(kmer1_data)]))
+kmer1_data$Label <- as.factor(kmer1_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer1_data[kmer1_data$Label==1,]
+neg_data <- kmer1_data[kmer1_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer1.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer1.svm.best.model <- kmer1.svm.tune.out$best.model
+
+kmer1.svm.y.pred <- predict(kmer1.svm.best.model,test_data)
+kmer1.svm.acc.res <- table(y.test,kmer1.svm.y.pred)
+
+kmer1.svm.acc <- (kmer1.svm.acc.res[1,1]+kmer1.svm.acc.res[2,2])/sum(kmer1.svm.acc.res)
+
+# k = 2
+kmer2_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/2-mer_freq.res",header = T)
+kmer2_data <- kmer2_data[,-1]
+kmer2_data[,2:ncol(kmer2_data)] <- (kmer2_data[,2:ncol(kmer2_data)]-min(kmer2_data[,2:ncol(kmer2_data)]))/(max(kmer2_data[,2:ncol(kmer2_data)]) - min(kmer2_data[,2:ncol(kmer2_data)]))
+kmer2_data$Label <- as.factor(kmer2_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer2_data[kmer2_data$Label==1,]
+neg_data <- kmer2_data[kmer2_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer2.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer2.svm.best.model <- kmer2.svm.tune.out$best.model
+
+kmer2.svm.y.pred <- predict(kmer2.svm.best.model,test_data)
+kmer2.svm.acc.res <- table(y.test,kmer2.svm.y.pred)
+
+kmer2.svm.acc <- (kmer2.svm.acc.res[1,1]+kmer2.svm.acc.res[2,2])/sum(kmer2.svm.acc.res)
+
+# k = 3
+kmer3_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/3-mer_freq.res",header = T)
+kmer3_data <- kmer3_data[,-1]
+kmer3_data[,2:ncol(kmer3_data)] <- (kmer3_data[,2:ncol(kmer3_data)]-min(kmer3_data[,2:ncol(kmer3_data)]))/(max(kmer3_data[,2:ncol(kmer3_data)]) - min(kmer3_data[,2:ncol(kmer3_data)]))
+kmer3_data$Label <- as.factor(kmer3_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer3_data[kmer3_data$Label==1,]
+neg_data <- kmer3_data[kmer3_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer3.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer3.svm.best.model <- kmer3.svm.tune.out$best.model
+
+kmer3.svm.y.pred <- predict(kmer3.svm.best.model,test_data)
+kmer3.svm.acc.res <- table(y.test,kmer3.svm.y.pred)
+
+kmer3.svm.acc <- (kmer3.svm.acc.res[1,1]+kmer3.svm.acc.res[2,2])/sum(kmer3.svm.acc.res)
+
+# k = 4
+kmer4_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/4-mer_freq.res",header = T)
+kmer4_data <- kmer4_data[,-1]
+kmer4_data[,2:ncol(kmer4_data)] <- (kmer4_data[,2:ncol(kmer4_data)]-min(kmer4_data[,2:ncol(kmer4_data)]))/(max(kmer4_data[,2:ncol(kmer4_data)]) - min(kmer4_data[,2:ncol(kmer4_data)]))
+kmer4_data$Label <- as.factor(kmer4_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer4_data[kmer4_data$Label==1,]
+neg_data <- kmer4_data[kmer4_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer4.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer4.svm.best.model <- kmer4.svm.tune.out$best.model
+
+kmer4.svm.y.pred <- predict(kmer4.svm.best.model,test_data)
+kmer4.svm.acc.res <- table(y.test,kmer4.svm.y.pred)
+
+kmer4.svm.acc <- (kmer4.svm.acc.res[1,1]+kmer4.svm.acc.res[2,2])/sum(kmer4.svm.acc.res)
+
+# k = 5
+kmer5_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/5-mer_freq.res",header = T)
+kmer5_data <- kmer5_data[,-1]
+kmer5_data[,2:ncol(kmer5_data)] <- (kmer5_data[,2:ncol(kmer5_data)]-min(kmer5_data[,2:ncol(kmer5_data)]))/(max(kmer5_data[,2:ncol(kmer5_data)]) - min(kmer5_data[,2:ncol(kmer5_data)]))
+kmer5_data$Label <- as.factor(kmer5_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer5_data[kmer5_data$Label==1,]
+neg_data <- kmer5_data[kmer5_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer5.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer5.svm.best.model <- kmer5.svm.tune.out$best.model
+
+kmer5.svm.y.pred <- predict(kmer5.svm.best.model,test_data)
+kmer5.svm.acc.res <- table(y.test,kmer5.svm.y.pred)
+
+kmer5.svm.acc <- (kmer5.svm.acc.res[1,1]+kmer5.svm.acc.res[2,2])/sum(kmer5.svm.acc.res)
+
+# k = 6
+kmer6_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/6-mer_freq.res",header = T)
+kmer6_data <- kmer6_data[,-1]
+kmer6_data[,2:ncol(kmer6_data)] <- (kmer6_data[,2:ncol(kmer6_data)]-min(kmer6_data[,2:ncol(kmer6_data)]))/(max(kmer6_data[,2:ncol(kmer6_data)]) - min(kmer6_data[,2:ncol(kmer6_data)]))
+kmer6_data$Label <- as.factor(kmer6_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer6_data[kmer6_data$Label==1,]
+neg_data <- kmer6_data[kmer6_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer6.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "radial",ranges = list(cost=c(0.01,0.1,1,5,10,100),gamma=c(1,3,5)))
+kmer6.svm.best.model <- kmer6.svm.tune.out$best.model
+
+kmer6.svm.y.pred <- predict(kmer6.svm.best.model,test_data)
+kmer6.svm.acc.res <- table(y.test,kmer6.svm.y.pred)
+
+kmer6.svm.acc <- (kmer6.svm.acc.res[1,1]+kmer6.svm.acc.res[2,2])/sum(kmer6.svm.acc.res)
+```
+
+```{r}
+### 支持向量机 linear
+# k = 1
+kmer1_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/1-mer_freq.res",header = T)
+kmer1_data <- kmer1_data[,-1]
+kmer1_data[,2:ncol(kmer1_data)] <- (kmer1_data[,2:ncol(kmer1_data)]-min(kmer1_data[,2:ncol(kmer1_data)]))/(max(kmer1_data[,2:ncol(kmer1_data)]) - min(kmer1_data[,2:ncol(kmer1_data)]))
+kmer1_data$Label <- as.factor(kmer1_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer1_data[kmer1_data$Label==1,]
+neg_data <- kmer1_data[kmer1_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer1.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer1.svm.best.model <- kmer1.svm.tune.out$best.model
+
+kmer1.svm.y.pred <- predict(kmer1.svm.best.model,test_data)
+kmer1.svm.acc.res <- table(y.test,kmer1.svm.y.pred)
+
+kmer1.svm.acc <- (kmer1.svm.acc.res[1,1]+kmer1.svm.acc.res[2,2])/sum(kmer1.svm.acc.res)
+plot.roc(y.test, as.numeric(kmer1.svm.y.pred), percent=TRUE, col="1",print.auc=TRUE,print.thres=TRUE)
+
+# k = 2
+kmer2_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/2-mer_freq.res",header = T)
+kmer2_data <- kmer2_data[,-1]
+kmer2_data[,2:ncol(kmer2_data)] <- (kmer2_data[,2:ncol(kmer2_data)]-min(kmer2_data[,2:ncol(kmer2_data)]))/(max(kmer2_data[,2:ncol(kmer2_data)]) - min(kmer2_data[,2:ncol(kmer2_data)]))
+kmer2_data$Label <- as.factor(kmer2_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer2_data[kmer2_data$Label==1,]
+neg_data <- kmer2_data[kmer2_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer2.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer2.svm.best.model <- kmer2.svm.tune.out$best.model
+
+kmer2.svm.y.pred <- predict(kmer2.svm.best.model,test_data)
+kmer2.svm.acc.res <- table(y.test,kmer2.svm.y.pred)
+
+kmer2.svm.acc <- (kmer2.svm.acc.res[1,1]+kmer2.svm.acc.res[2,2])/sum(kmer2.svm.acc.res)
+
+# k = 3
+kmer3_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/3-mer_freq.res",header = T)
+kmer3_data <- kmer3_data[,-1]
+kmer3_data[,2:ncol(kmer3_data)] <- (kmer3_data[,2:ncol(kmer3_data)]-min(kmer3_data[,2:ncol(kmer3_data)]))/(max(kmer3_data[,2:ncol(kmer3_data)]) - min(kmer3_data[,2:ncol(kmer3_data)]))
+kmer3_data$Label <- as.factor(kmer3_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer3_data[kmer3_data$Label==1,]
+neg_data <- kmer3_data[kmer3_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer3.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer3.svm.best.model <- kmer3.svm.tune.out$best.model
+
+kmer3.svm.y.pred <- predict(kmer3.svm.best.model,test_data)
+kmer3.svm.acc.res <- table(y.test,kmer3.svm.y.pred)
+
+kmer3.svm.acc <- (kmer3.svm.acc.res[1,1]+kmer3.svm.acc.res[2,2])/sum(kmer3.svm.acc.res)
+
+# k = 4
+kmer4_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/4-mer_freq.res",header = T)
+kmer4_data <- kmer4_data[,-1]
+kmer4_data[,2:ncol(kmer4_data)] <- (kmer4_data[,2:ncol(kmer4_data)]-min(kmer4_data[,2:ncol(kmer4_data)]))/(max(kmer4_data[,2:ncol(kmer4_data)]) - min(kmer4_data[,2:ncol(kmer4_data)]))
+kmer4_data$Label <- as.factor(kmer4_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer4_data[kmer4_data$Label==1,]
+neg_data <- kmer4_data[kmer4_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer4.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer4.svm.best.model <- kmer4.svm.tune.out$best.model
+
+kmer4.svm.y.pred <- predict(kmer4.svm.best.model,test_data)
+kmer4.svm.acc.res <- table(y.test,kmer4.svm.y.pred)
+
+kmer4.svm.acc <- (kmer4.svm.acc.res[1,1]+kmer4.svm.acc.res[2,2])/sum(kmer4.svm.acc.res)
+
+# k = 5
+kmer5_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/5-mer_freq.res",header = T)
+kmer5_data <- kmer5_data[,-1]
+kmer5_data[,2:ncol(kmer5_data)] <- (kmer5_data[,2:ncol(kmer5_data)]-min(kmer5_data[,2:ncol(kmer5_data)]))/(max(kmer5_data[,2:ncol(kmer5_data)]) - min(kmer5_data[,2:ncol(kmer5_data)]))
+kmer5_data$Label <- as.factor(kmer5_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer5_data[kmer5_data$Label==1,]
+neg_data <- kmer5_data[kmer5_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer5.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer5.svm.best.model <- kmer5.svm.tune.out$best.model
+
+kmer5.svm.y.pred <- predict(kmer5.svm.best.model,test_data)
+kmer5.svm.acc.res <- table(y.test,kmer5.svm.y.pred)
+
+kmer5.svm.acc <- (kmer5.svm.acc.res[1,1]+kmer5.svm.acc.res[2,2])/sum(kmer5.svm.acc.res)
+
+# k = 6
+kmer6_data <- fread("/home/luohh/Course/SWTJX/Classification/Result/6-mer_freq.res",header = T)
+kmer6_data <- kmer6_data[,-1]
+kmer6_data[,2:ncol(kmer6_data)] <- (kmer6_data[,2:ncol(kmer6_data)]-min(kmer6_data[,2:ncol(kmer6_data)]))/(max(kmer6_data[,2:ncol(kmer6_data)]) - min(kmer6_data[,2:ncol(kmer6_data)]))
+kmer6_data$Label <- as.factor(kmer6_data$Label)
+# 正负样本各随机一半作为训练集和测试集
+pos_data <- kmer6_data[kmer6_data$Label==1,]
+neg_data <- kmer6_data[kmer6_data$Label==0,]
+
+set.seed(111111)
+pos_train <- sample(nrow(pos_data),nrow(pos_data)/2)
+set.seed(111111)
+neg_train <- sample(nrow(neg_data),nrow(neg_data)/2)
+
+train_data <- rbind(pos_data[pos_train,],neg_data[neg_train,])
+x.train <- train_data[,2:ncol(train_data)]
+y.train <- train_data$Label
+
+test_data <- rbind(pos_data[-pos_train,],neg_data[-neg_train,])
+x.test <- test_data[,2:ncol(test_data)]
+y.test <- test_data$Label
+
+kmer6.svm.tune.out <- tune(svm,Label~.,data = train_data,kernel = "linear",ranges = list(cost=c(0.01,0.1,1,5,10,100)))
+kmer6.svm.best.model <- kmer6.svm.tune.out$best.model
+
+kmer6.svm.y.pred <- predict(kmer6.svm.best.model,test_data)
+kmer6.svm.acc.res <- table(y.test,kmer6.svm.y.pred)
+
+kmer6.svm.acc <- (kmer6.svm.acc.res[1,1]+kmer6.svm.acc.res[2,2])/sum(kmer6.svm.acc.res)
+```
+
+
+
